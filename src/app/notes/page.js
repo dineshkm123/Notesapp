@@ -1,11 +1,14 @@
-
+'use client'
 
 import Notesoverview from "@/components/notes-overview";
+import { useEffect, useState } from "react";
 
 async function fetchlistofnotes() {
     try {
-        const apiResponse = await fetch("http://localhost:3000/api/getnotes", { method: "GET", cache: "no-store" });
-
+        // const { data, error } = useSWR('/api/getnotes', fetcher);
+        const baseUrl = window.location.origin;
+        const apiUrl = `${baseUrl}/api/getnotes`;
+        const apiResponse = await fetch(apiUrl, { method: "GET", cache: "no-store" });
         const result = await apiResponse.json();
         return result?.data;
     } catch (error) {
@@ -14,12 +17,19 @@ async function fetchlistofnotes() {
 }
 
 
-async function Notes() {
+function Notes() {
+    const [noteslist, setNoteslist] = useState([])
+    console.log(noteslist)
+    useEffect(() => {
+        const fn = async () => {
 
-    const noteslist = await fetchlistofnotes()
+            const result = await fetchlistofnotes()
+            if (result)
+                setNoteslist(result)
+        }
+        fn()
 
+    }, [])
     return (<Notesoverview noteslist={noteslist} />);
-
-
 }
 export default Notes;
